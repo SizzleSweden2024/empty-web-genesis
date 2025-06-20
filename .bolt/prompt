@@ -3,3 +3,155 @@ For all designs I ask you to make, have them be beautiful, not cookie cutter. Ma
 By default, this template supports JSX syntax with Tailwind CSS classes, React hooks, and Lucide React for icons. Do not install other packages for UI themes, icons, etc unless absolutely necessary or I request them.
 
 Use icons from lucide-react for logos.
+
+The goal of this knowledge base is to ensure that all code, design, and content implementations for the PAULIE polling app are optimized for search engine indexing (SEO) and AI crawling. This involves creating a highly structured, accessible, and semantic web application that ensures discoverability by search engines and AI agents, while maintaining excellent performance and user experience.
+General Guidelines for SEO
+Semantic HTML Structure:
+Use proper HTML5 semantic tags (<header>, <section>, <main>, <nav>, <article>, <aside>, <footer>).
+Ensure that every page has a clear hierarchy of headings (<h1>, <h2>, <h3>).
+Use <h1> only once per page, and ensure it describes the main topic.
+Meta Tags:
+Title Tags: Ensure each page has a unique and descriptive <title> tag (max 60 characters).
+Example: Poll Results: Discover Insights on Relationships | PAULIE
+Meta Descriptions: Add a <meta name="description"> tag for each page with a summary of its content (max 160 characters).
+Example: "Explore real-time polling data on relationships, life, and more. Join PAULIE to uncover the truth behind everyday questions."
+Use <meta name="robots" content="index, follow"> to allow search engine indexing by default unless otherwise specified.
+Include <meta name="viewport" content="width=device-width, initial-scale=1.0"> for mobile responsiveness.
+Keywords:
+Incorporate relevant keywords naturally into titles, meta tags, headings, and body content. Avoid keyword stuffing.
+Maintain a focus on long-tail keywords to target specific user queries (e.g., “how many hours do people spend on social media?”).
+Canonical Tags:
+Use canonical URLs (<link rel="canonical" href="https://example.com/page-url">) to prevent duplicate content issues and ensure search engines know the preferred version of every page.
+Alt Text for Images:
+Add descriptive alt attributes to all images for accessibility and SEO.
+Example: <img src="poll-results.jpg" alt="Poll results on sleep habits">.
+Internal Linking:
+Create a strong internal linking structure to connect related pages (e.g., link from a poll results page to trending polls or category pages).
+Use descriptive anchor text for links (e.g., "View trending polls on relationships" instead of "Click here").
+URL Optimization:
+Ensure all URLs are short, descriptive, and use hyphens to separate words.
+Example: https://example.com/polls/relationships rather than https://example.com/polls?id=12345.
+Structured Data & Schema Markup:
+Use JSON-LD or Microdata for structured data to help search engines understand the content.
+Add schema for polls, questions, and results using the Poll Schema: https://schema.org/Question.
+Example (JSON-LD for a poll):
+json
+
+
+{
+  "@context": "https://schema.org",
+  "@type": "Question",
+  "name": "How many hours of sleep do you get?",
+  "text": "How many hours of sleep do you get on average every night?",
+  "answerCount": 500,
+  "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "7-8 hours",
+    "upvoteCount": 300
+  }
+}
+AI Crawling Friendliness
+XML Sitemap Generation:
+Automatically generate and update an XML sitemap to include all pages, and ensure it is accessible at /sitemap.xml.
+Example URL in sitemap:
+xml
+
+
+<url>
+  <loc>https://example.com/polls/relationships</loc>
+  <lastmod>2025-06-15</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.8</priority>
+</url>
+Robots.txt Configuration:
+Create a robots.txt file to guide search engine crawlers.
+txt
+
+
+User-agent: *
+Allow: /
+Sitemap: https://example.com/sitemap.xml
+Page Load Speed Optimization:
+Core Web Vitals: Optimize for:
+Largest Contentful Paint (LCP): < 2.5 seconds.
+First Input Delay (FID): < 100ms.
+Cumulative Layout Shift (CLS): < 0.1.
+Use lazy loading for images and assets (loading="lazy").
+Minify CSS, JavaScript, and HTML files.
+Enable GZIP compression for faster file delivery.
+Use a Content Delivery Network (CDN) for static assets.
+Mobile-First Design:
+Ensure all pages are responsive and optimized for mobile devices.
+Use touch-friendly designs with appropriate tap targets.
+Accessibility (WCAG Compliance):
+Add ARIA roles and labels to interactive elements.
+Ensure keyboard navigation and screen reader compatibility.
+Provide text alternatives for non-text content.
+Analytics & Tracking:
+Integrate Google Analytics and Google Search Console for monitoring:
+Crawling errors
+Indexing status
+Keyword rankings
+Add meta tag verification for search engine tools (e.g., <meta name="google-site-verification" content="your-code">).
+Content Optimization for SEO
+Dynamic Content Updates:
+Ensure trending polls and results are updated in real-time to keep content fresh.
+Display "last updated" timestamps for polls and results.
+Content Hierarchy:
+Use a clear content hierarchy on each page:
+<h1> for the main topic (e.g., "Poll Results on Sleep Habits").
+<h2> for subtopics (e.g., "Demographic Breakdown").
+<h3> for smaller sections (e.g., "Age Group: 18-25").
+Engaging Metadata:
+Use compelling meta descriptions and titles to improve click-through rates (CTR).
+Example for a poll page:
+Title: "Discover Insights: How Many Hours Do People Sleep on Average?"
+Description: "Join 5,000+ users in uncovering the truth about sleep habits. See live results filtered by age, gender, and more."
+Social Sharing Optimization:
+Add Open Graph (OG) meta tags for social sharing.
+html
+
+
+<meta property="og:title" content="Poll Results: Sleep Habits">
+<meta property="og:description" content="Discover how many hours people sleep on average, filtered by demographics.">
+<meta property="og:image" content="https://example.com/images/poll-results.jpg">
+<meta property="og:url" content="https://example.com/polls/sleep-habits">
+<meta property="og:type" content="website">
+Keyword Optimization:
+Identify 5-10 primary keywords for each page and incorporate them strategically into:
+Page titles
+Headings
+URLs
+Body content
+Tools to Use: Google Keyword Planner, SEMrush, or Ahrefs for identifying relevant keywords.
+Technical Implementation Notes
+Server-Side Rendering (SSR):
+Use SSR to ensure content is crawlable by search engines and loads faster.
+Render poll data on the server before sending to the client.
+Static Site Generation (SSG):
+Use SSG for non-dynamic pages (e.g., About Us, Help pages) to improve load times and ranking.
+Pagination & Infinite Scrolling:
+Implement proper pagination with crawlable URLs for poll feeds.
+Example:
+Page 1: https://example.com/polls?page=1
+Page 2: https://example.com/polls?page=2
+Error Handling:
+Use custom 404 and 500 error pages with helpful navigation back to the main site.
+Example:
+html
+
+
+<meta name="robots" content="noindex, follow">
+Testing & Monitoring
+SEO Audits:
+Perform regular audits using tools like Google Search Console, Ahrefs, or SEMrush.
+Performance Testing:
+Use Lighthouse or PageSpeed Insights to ensure Core Web Vitals are consistently high.
+Crawling Tests:
+Use Screaming Frog or similar tools to verify AI crawling and indexing behavior.
+Summary
+This knowledge base ensures that all coding and design efforts prioritize:
+Discoverability by search engines (Google, Bing, etc.)
+Accessibility and usability for a diverse audience
+High performance for mobile and desktop users
+Alignment with modern SEO and AI crawling requirements to maximize the app's reach and user value.
