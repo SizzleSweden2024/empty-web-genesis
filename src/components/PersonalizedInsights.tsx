@@ -84,7 +84,7 @@ const PersonalizedInsights: React.FC<PersonalizedInsightsProps> = ({
       {!userDemographics?.ageRange && (
         <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
           <p className="text-xs text-blue-700 dark:text-blue-300">
-            💡 <strong>Unlock deeper insights!</strong> Complete your profile with age, gender, and location in your <a href="/profile" className="underline hover:no-underline">profile settings</a> to see how your answers compare to people with similar backgrounds.
+            💡 <strong>Unlock deeper insights!</strong> Complete your profile with age, gender, and location in your <a href="/profile" className=\"underline hover:no-underline">profile settings</a> to see how your answers compare to people with similar backgrounds.
           </p>
         </div>
       )}
