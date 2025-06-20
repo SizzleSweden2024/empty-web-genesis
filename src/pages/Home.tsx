@@ -10,7 +10,6 @@ import { getTodaysInsights } from '../lib/supabase';
 import { useInfinitePolls, useAnswerPolls } from '../hooks/useInfinitePolls';
 import { useAuth } from '../contexts/AuthContext';
 import { PollCategory, Poll } from '../types';
-import { generatePollInsight, PollInsight } from '../utils/pollInsights';
 
 type Insight = {
   value: string;
@@ -20,33 +19,18 @@ type Insight = {
 
 const categories: PollCategory[] = ['All', 'Life', 'Work', 'Entertainment', 'Finance', 'Health', 'Relationships', 'Technology', 'Sports'];
 
-// Helper component to wrap individual polls with insight generation
-const PollInsightWrapper: React.FC<{ 
+// Helper component to wrap individual polls
+const PollTileWrapper: React.FC<{ 
   poll: Poll; 
   getPollTags: (poll: Poll) => PollTag[];
   showResultsOnly?: boolean;
 }> = ({ poll, getPollTags, showResultsOnly = false }) => {
-  const { data: insight, isLoading } = useQuery<PollInsight>({
-    queryKey: ['poll-insight', poll.id],
-    queryFn: () => generatePollInsight(poll),
-    staleTime: 24 * 60 * 60 * 1000, // 24 hours (reduced from 48 for faster refresh)
-    gcTime: 24 * 60 * 60 * 1000, // 24 hours cache time
-  });
-
-  if (isLoading || !insight) {
-    return (
-      <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm p-4 border border-gray-200 dark:border-dark-700/50 flex items-center justify-center h-40">
-        <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
 
   const tags = getPollTags(poll);
 
   return (
     <DiscoverPollTile
       poll={poll}
-      insight={insight}
       tags={tags}
       showResultsOnly={showResultsOnly}
       onClick={() => {
@@ -181,7 +165,7 @@ const Home: React.FC = () => {
               className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
             >
               {allAnsweredPolls.map(poll => (
-                <PollInsightWrapper 
+                <PollTileWrapper 
                   key={poll.id} 
                   poll={poll} 
                   getPollTags={getPollTags}
@@ -220,7 +204,7 @@ const Home: React.FC = () => {
               className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
             >
               {allTrendingPolls.map(poll => (
-                <PollInsightWrapper 
+                <PollTileWrapper 
                   key={poll.id} 
                   poll={poll} 
                   getPollTags={getPollTags}

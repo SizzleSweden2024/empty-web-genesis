@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Poll, FilterOptions } from '../types';
 import { getPollStats } from '../lib/supabase';
 import FilterPanel from './FilterPanel';
+import PersonalizedInsights from './PersonalizedInsights';
 import BarChart from './charts/BarChart';
 import PieChart from './charts/PieChart';
 
@@ -89,6 +90,16 @@ const PollResults: React.FC<PollResultsProps> = ({ poll, userResponse }) => {
         
         {stats.count > 0 ? (
           <div className="space-y-4 sm:space-y-6">
+            {/* Personalized Insights - only show if user has responded */}
+            {userResponse !== undefined && userResponse !== null && (
+              <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
+                <PersonalizedInsights 
+                  poll={poll} 
+                  userResponse={userResponse}
+                />
+              </div>
+            )}
+            
             {/* Statistical Summary */}
             {(stats.mean !== undefined || stats.median !== undefined || stats.mode !== undefined) && (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">

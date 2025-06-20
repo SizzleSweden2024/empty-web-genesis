@@ -1,8 +1,8 @@
 import React from 'react';
 import { Poll } from '../types';
-import { PollInsight } from '../utils/pollInsights';
 import { useDarkMode } from '../hooks/useDarkMode';
 import { getCategoryGradient } from '../utils/categoryGradients';
+import GlobalInsights from './GlobalInsights';
 
 export interface PollTag {
   label: string;
@@ -12,7 +12,6 @@ export interface PollTag {
 
 interface DiscoverPollTileProps {
   poll: Poll;
-  insight: PollInsight;
   tags: PollTag[];
   onClick?: () => void;
   showResultsOnly?: boolean;
@@ -20,7 +19,6 @@ interface DiscoverPollTileProps {
 
 const DiscoverPollTile: React.FC<DiscoverPollTileProps> = ({ 
   poll, 
-  insight, 
   tags,
   onClick,
   showResultsOnly = false
@@ -98,45 +96,9 @@ const DiscoverPollTile: React.FC<DiscoverPollTileProps> = ({
         </h3>
       </div>
 
-      {/* Main Insight - Styled like the image */}
+      {/* Global Insights */}
       <div className="mb-4">
-        {insight.hasData ? (
-          // Format insights like in the image
-          insight.description.includes('said yes') || insight.description.includes('said no') ? (
-            // Boolean poll results: "43% No  57% Yes"
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center">
-                <span className="text-lg font-bold text-red-500 mr-1">
-                  {insight.description.includes('said no') ? insight.value : `${100 - parseInt(insight.value)}%`}
-                </span>
-                <span className="text-sm text-gray-600 dark:text-gray-400">No</span>
-              </div>
-              <div className="flex items-center">
-                <span className="text-lg font-bold text-blue-500 mr-1">
-                  {insight.description.includes('said yes') ? insight.value : `${100 - parseInt(insight.value)}%`}
-                </span>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Yes</span>
-              </div>
-            </div>
-          ) : insight.description.includes('chose') ? (
-            // Choice poll results: "Social media leads with 43%"
-            <div>
-              <div className="text-sm text-purple-600 dark:text-purple-400 font-medium">
-                {insight.description.replace(`chose "`, '').replace(`" as their top answer`, ` leads with ${insight.value}`)}
-              </div>
-            </div>
-          ) : (
-            // Numeric/other results
-            <div>
-              <span className="text-lg font-bold text-blue-500 mr-2">{insight.value}</span>
-              <span className="text-sm text-gray-600 dark:text-gray-400">{insight.description}</span>
-            </div>
-          )
-        ) : (
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            {insight.description}
-          </div>
-        )}
+        <GlobalInsights poll={poll} />
       </div>
     </div>
   );
