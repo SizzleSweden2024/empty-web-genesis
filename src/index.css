@@ -34,3 +34,21 @@
   transform: scale(1.1);
   box-shadow: 0 6px 12px rgba(59, 130, 246, 0.4);
 }
+
+/* Disable text selection on swipe cards */
+.swipe-card {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth scrolling for mobile */
+@media (max-width: 768px) {
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+}

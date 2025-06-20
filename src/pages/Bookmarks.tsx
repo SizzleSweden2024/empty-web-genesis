@@ -7,11 +7,14 @@ import PollCard from '../components/PollCard';
 import { fetchPollById, fetchBookmarkedPollIds } from '../lib/supabase';
 import { formatSupabasePoll } from '../utils/pollFormatters';
 import { useAuth } from '../contexts/AuthContext';
+import { useViewMode } from '../hooks/useViewMode';
 import { Poll } from '../types';
+import SwipeInterface from '../components/SwipeInterface';
 
 const Bookmarks: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { viewMode } = useViewMode();
 
   const handleGoBack = () => {
     navigate(-1);
@@ -116,11 +119,37 @@ const Bookmarks: React.FC = () => {
             </p>
           </div>
         ) : (
-          <div className="grid gap-3 sm:gap-4">
-            {bookmarkedPolls.map(poll => (
-              <PollCard key={poll.id} poll={poll} />
-            ))}
-          </div>
+          <>
+            {viewMode === 'swipe' ? (
+              <div className="space-y-6">
+                <div className="bg-white dark:bg-dark-800/50 backdrop-blur rounded-xl p-4 border border-gray-200 dark:border-dark-700/50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Bookmark className="h-4 w-4 text-blue-500 mr-2" />
+                      <span className="text-gray-900 dark:text-white font-medium text-sm">
+                        Bookmarked Polls: {bookmarkedPolls.length}
+                      </span>
+                    </div>
+                    <div className="text-gray-500 dark:text-dark-300 text-xs">
+                      Swipe to browse • Tap to view
+                    </div>
+                  </div>
+                </div>
+                
+                <SwipeInterface
+                  polls={bookmarkedPolls}
+                  isLoading={false}
+                  hasNextPage={false}
+                />
+              </div>
+            ) : (
+              <div className="grid gap-3 sm:gap-4">
+                {bookmarkedPolls.map(poll => (
+                  <PollCard key={poll.id} poll={poll} />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>

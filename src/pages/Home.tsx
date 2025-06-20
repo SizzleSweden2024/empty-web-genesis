@@ -9,7 +9,9 @@ import DiscoverPollTile, { PollTag } from '../components/DiscoverPollTile';
 import { getTodaysInsights } from '../lib/supabase';
 import { useInfinitePolls, useAnswerPolls } from '../hooks/useInfinitePolls';
 import { useAuth } from '../contexts/AuthContext';
+import { useViewMode } from '../hooks/useViewMode';
 import { PollCategory, Poll } from '../types';
+import SwipeInterface from '../components/SwipeInterface';
 
 type Insight = {
   value: string;
@@ -44,6 +46,7 @@ const PollTileWrapper: React.FC<{
 const Home: React.FC = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { viewMode } = useViewMode();
   const [activeTab, setActiveTab] = useState<'discover' | 'answer'>('discover');
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('All');
@@ -133,6 +136,37 @@ const Home: React.FC = () => {
   };
 
   const renderDiscoverContent = () => {
+    // Mobile swipe view for discover
+    if (viewMode === 'swipe') {
+      const allTrendingPolls = trendingPolls.data?.pages.flatMap(page => page.polls) || [];
+      
+      return (
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-dark-800/50 backdrop-blur rounded-xl p-4 mb-6 border border-gray-200 dark:border-dark-700/50">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 mr-2" />
+                <span className="text-gray-900 dark:text-white font-medium text-xs sm:text-sm">
+                  Discover Mode: {allTrendingPolls.length} Popular Questions
+                </span>
+              </div>
+              <div className="text-gray-500 dark:text-dark-300 text-xs">
+                Swipe to explore • Tap to view details
+              </div>
+            </div>
+          </div>
+
+          <SwipeInterface
+            polls={allTrendingPolls}
+            isLoading={trendingPolls.isLoading}
+            hasNextPage={trendingPolls.hasNextPage}
+            fetchNextPage={trendingPolls.fetchNextPage}
+            isFetchingNextPage={trendingPolls.isFetchingNextPage}
+          />
+        </div>
+      );
+    }
+    
     if (discoverFilter === 'answered' && user) {
       const allAnsweredPolls = answeredPolls.data?.pages.flatMap(page => page.polls) || [];
       
@@ -220,6 +254,53 @@ const Home: React.FC = () => {
 
   const renderAnswerContent = () => {
     const allAnswerPolls = answerPolls.data?.pages.flatMap(page => page.polls) || [];
+    
+    // Mobile swipe view
+    if (viewMode === 'swipe') {
+      if (!user) {
+        return (
+          <div className="bg-white dark:bg-dark-800/50 backdrop-blur rounded-xl p-8 text-center border border-gray-200 dark:border-dark-700/50">
+            <MessageSquare className="h-12 w-12 text-gray-400 dark:text-dark-400 mx-auto mb-4" />
+            <h2 className="text-lg sm:text-xl font-medium text-gray-900 dark:text-white mb-2">Sign in to answer polls</h2>
+            <p className="text-gray-500 dark:text-dark-300 text-sm mb-4">
+              Join our community and share your thoughts on various topics.
+            </p>
+            <button
+              onClick={() => window.location.href = '/auth'}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow transition-colors duration-200 text-sm font-medium"
+            >
+              Sign In to Start Answering
+            </button>
+          </div>
+        );
+      }
+
+      return (
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-dark-800/50 backdrop-blur rounded-xl p-4 mb-6 border border-gray-200 dark:border-dark-700/50">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 mr-2" />
+                <span className="text-gray-900 dark:text-white font-medium text-xs sm:text-sm">
+                  Swipe Mode: {allAnswerPolls.length} Questions
+                </span>
+              </div>
+              <div className="text-gray-500 dark:text-dark-300 text-xs">
+                Swipe left to skip • Swipe right to answer
+              </div>
+            </div>
+          </div>
+
+          <SwipeInterface
+            polls={allAnswerPolls}
+            isLoading={answerPolls.isLoading}
+            hasNextPage={answerPolls.hasNextPage}
+            fetchNextPage={answerPolls.fetchNextPage}
+            isFetchingNextPage={answerPolls.isFetchingNextPage}
+          />
+        </div>
+      );
+    }
     
     // Show sign-in prompt if user is not authenticated
     if (!user) {

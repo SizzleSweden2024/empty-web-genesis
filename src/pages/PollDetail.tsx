@@ -10,11 +10,13 @@ import { fetchPollById, createPollResponse } from '../lib/supabase';
 import { formatSupabasePoll } from '../utils/pollFormatters';
 import { hasRespondedToPoll, savePollResponse } from '../utils/localStorage';
 import { useAuth } from '../contexts/AuthContext';
+import { useViewMode } from '../hooks/useViewMode';
 
 const PollDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { viewMode } = useViewMode();
   const queryClient = useQueryClient();
   const [hasResponded, setHasResponded] = useState(hasRespondedToPoll(id || ''));
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -116,11 +118,14 @@ const PollDetail: React.FC = () => {
 
   const typeInfo = getPollTypeInfo();
   
+  // For mobile swipe view, use a more compact layout
+  const isMobileSwipeView = viewMode === 'swipe' && window.innerWidth < 768;
+  
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-900">
+    <div className={`min-h-screen ${isMobileSwipeView ? 'bg-gray-50 dark:bg-gray-900' : 'bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-900'}`}>
       <NavBar />
       
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-10">
+      <main className={`${isMobileSwipeView ? 'px-2 pt-16 pb-4' : 'max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-10'}`}>
         {/* Back Button */}
         <motion.button
           initial={{ opacity: 0, x: -20 }}
