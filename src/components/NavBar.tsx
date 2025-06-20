@@ -3,12 +3,15 @@ import { PlusCircle, BarChart2, Bookmark, User, Menu, X, ChevronLeft, Moon, Sun 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useDarkMode } from '../hooks/useDarkMode';
+import { useViewMode } from '../hooks/useViewMode';
+import ViewModeToggle from './ViewModeToggle';
 
 const NavBar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const { viewMode, toggleViewMode } = useViewMode();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isActive = (path: string) => {
@@ -46,6 +49,9 @@ const NavBar: React.FC = () => {
           
           <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
             {/* Dark Mode Toggle */}
+            {/* View Mode Toggle */}
+            <ViewModeToggle viewMode={viewMode} onToggle={toggleViewMode} />
+            
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -111,6 +117,9 @@ const NavBar: React.FC = () => {
           
           <div className="flex sm:hidden items-center space-x-2">
             {/* Mobile Dark Mode Toggle */}
+            {/* Mobile View Mode Toggle */}
+            <ViewModeToggle viewMode={viewMode} onToggle={toggleViewMode} />
+            
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
