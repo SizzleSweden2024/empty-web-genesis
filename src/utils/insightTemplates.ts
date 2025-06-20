@@ -39,13 +39,23 @@ export function generateGlobalInsights(
 ): GlobalInsight[] {
   const insights: GlobalInsight[] = [];
   
-  if (stats.count < 10) {
+  if (stats.count < 1) {
     return [{
       type: 'global',
-      text: `Only ${stats.count} responses so far — be among the first to answer!`,
+      text: `No responses yet — be the first to answer!`,
       icon: '🚀',
       color: 'text-blue-600'
     }];
+  }
+
+  // Show early response insight for very low counts (but still generate insights)
+  if (stats.count < 3) {
+    insights.push({
+      type: 'global',
+      text: `Early insights from ${stats.count} ${stats.count === 1 ? 'response' : 'responses'} — more data coming soon!`,
+      icon: '🌟',
+      color: 'text-yellow-600'
+    });
   }
 
   const { distribution } = stats;
@@ -179,14 +189,25 @@ export function generatePersonalizedInsights(
 ): PersonalizedInsight[] {
   const insights: PersonalizedInsight[] = [];
   
-  if (stats.count < 5) {
+  if (stats.count < 1) {
     return [{
       type: 'personalized',
-      text: `You're among the first ${stats.count} people to answer this question!`,
+      text: `You're the first person to answer this question!`,
       icon: '🌟',
       color: 'text-yellow-600',
       isComparison: false
     }];
+  }
+
+  // Show early adopter insight for very low counts (but still generate insights)
+  if (stats.count < 2) {
+    insights.push({
+      type: 'personalized',
+      text: `You're among the first ${stats.count} ${stats.count === 1 ? 'person' : 'people'} to answer this question!`,
+      icon: '🚀',
+      color: 'text-yellow-600',
+      isComparison: false
+    });
   }
 
   const { distribution } = stats;

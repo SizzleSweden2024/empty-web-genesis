@@ -213,13 +213,13 @@ const SwipeCard: React.FC<SwipeCardProps> = ({
               
               <div className="text-center">
                 <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
-                  Tap to {hasResponded ? 'view details' : 'answer'}
+                  Tap to view details
                 </p>
                 <div className="w-8 h-1 bg-white/60 dark:bg-gray-400/60 rounded-full mx-auto"></div>
               </div>
               
               <div className="flex items-center space-x-2 text-xs text-gray-600 dark:text-gray-400">
-                <span>{hasResponded ? 'Details' : 'Answer'}</span>
+                <span>Details</span>
                 <ArrowRight className="h-4 w-4" />
               </div>
             </div>

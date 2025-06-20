@@ -2,26 +2,24 @@ import React, { useState } from 'react';
 import { useParams, Navigate, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, Users, Clock, BarChart3, TrendingUp, CheckCircle2, ArrowRight } from 'lucide-react';
+import { ChevronLeft, UserPlus, Sparkles, Target } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import ModernPollResponseForm from '../components/ModernPollResponseForm';
 import ModernPollResults from '../components/ModernPollResults';
+import GlobalInsights from '../components/GlobalInsights';
 import { fetchPollById, createPollResponse } from '../lib/supabase';
 import { formatSupabasePoll } from '../utils/pollFormatters';
 import { hasRespondedToPoll, savePollResponse } from '../utils/localStorage';
 import { useAuth } from '../contexts/AuthContext';
-import { useViewMode } from '../hooks/useViewMode';
 
 const PollDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { viewMode } = useViewMode();
   const queryClient = useQueryClient();
   const [hasResponded, setHasResponded] = useState(hasRespondedToPoll(id || ''));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showResults, setShowResults] = useState(hasResponded);
   
   const { data: poll, isLoading } = useQuery({
     queryKey: ['poll', id],
@@ -35,7 +33,12 @@ const PollDetail: React.FC = () => {
   });
   
   const handlePollSubmit = async (response: any) => {
-    if (!poll || !id || !user) {
+    if (!poll || !id) {
+      setError('Poll data is not available');
+      return;
+    }
+
+    if (!user) {
       setError('You must be logged in to submit a response');
       return;
     }
@@ -47,7 +50,6 @@ const PollDetail: React.FC = () => {
       await createPollResponse(id, user.id, response, {});
       savePollResponse(id, response);
       setHasResponded(true);
-      setShowResults(true);
       
       // Invalidate related queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['poll', id] });
@@ -65,49 +67,15 @@ const PollDetail: React.FC = () => {
   const handleGoBack = () => {
     navigate(-1);
   };
-
-  const getPollTypeInfo = () => {
-    if (!poll) return { icon: '❓', label: 'Unknown', color: 'text-gray-500' };
-    
-    switch (poll.type) {
-      case 'boolean':
-        return { icon: '✓', label: 'Yes/No Question', color: 'text-emerald-600' };
-      case 'slider':
-        return { icon: '⚡', label: 'Scale Rating', color: 'text-blue-600' };
-      case 'numeric':
-        return { icon: '#', label: 'Number Input', color: 'text-purple-600' };
-      case 'choice':
-        return { icon: '◉', label: 'Multiple Choice', color: 'text-orange-600' };
-      default:
-        return { icon: '❓', label: 'Unknown', color: 'text-gray-500' };
-    }
-  };
-
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
-  };
   
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="flex flex-col items-center space-y-4"
-        >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
-          />
-          <p className="text-gray-600 dark:text-gray-300 font-medium">Loading poll...</p>
-        </motion.div>
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
+        />
       </div>
     );
   }
@@ -115,230 +83,198 @@ const PollDetail: React.FC = () => {
   if (!poll) {
     return <Navigate to="/" />;
   }
-
-  const typeInfo = getPollTypeInfo();
-  
-  // For mobile swipe view, use a more compact layout
-  const isMobileSwipeView = viewMode === 'swipe' && window.innerWidth < 768;
   
   return (
-    <div className={`min-h-screen ${isMobileSwipeView ? 'bg-gray-50 dark:bg-gray-900' : 'bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-900'}`}>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <NavBar />
       
-      <main className={`${isMobileSwipeView ? 'px-2 pt-16 pb-4' : 'max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-10'}`}>
-        {/* Back Button */}
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-10">
+        {/* Go Back Button */}
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={handleGoBack}
-          className="mb-6 flex items-center text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors group"
+          className="mb-6 flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md p-2"
         >
-          <ChevronLeft className="h-5 w-5 mr-1 group-hover:-translate-x-1 transition-transform" />
-          <span className="font-medium">Back to polls</span>
+          <ChevronLeft className="h-5 w-5 mr-1" />
+          <span className="text-sm font-medium">Back</span>
         </motion.button>
 
-        {/* Poll Header Card */}
+        {/* Poll Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
           className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden mb-8"
         >
-          {/* Header Stats Bar */}
-          <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4">
-            <div className="flex items-center justify-between text-white">
-              <div className="flex items-center space-x-6">
-                <motion.div 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: "spring" }}
-                  className="flex items-center space-x-2"
-                >
-                  <Users className="h-5 w-5" />
-                  <span className="font-semibold">{poll.responseCount.toLocaleString()}</span>
-                  <span className="text-blue-100">responses</span>
-                </motion.div>
-                
-                <motion.div 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.3, type: "spring" }}
-                  className="flex items-center space-x-2"
-                >
-                  <TrendingUp className="h-5 w-5" />
-                  <span className="font-semibold">{poll.upvotes}</span>
-                  <span className="text-blue-100">upvotes</span>
-                </motion.div>
-              </div>
-              
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="flex items-center space-x-2 text-blue-100"
+          <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-6">
+            <div className="flex items-center space-x-3 mb-4">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", delay: 0.2 }}
+                className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"
               >
-                <Clock className="h-4 w-4" />
-                <span className="text-sm">{formatDate(poll.createdAt)}</span>
+                <Sparkles className="h-5 w-5 text-white" />
               </motion.div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
+                  {poll.question}
+                </h1>
+                {poll.category && (
+                  <span className="inline-block mt-2 px-3 py-1 bg-white/20 rounded-full text-white text-sm font-medium">
+                    {poll.category}
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
-
-          {/* Poll Content */}
-          <div className="p-6 sm:p-8">
-            {/* Poll Type Badge */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="mb-4"
-            >
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${typeInfo.color} bg-gray-100 dark:bg-gray-700`}>
-                <span className="mr-2">{typeInfo.icon}</span>
-                {typeInfo.label}
-              </span>
-            </motion.div>
-
-            {/* Question */}
-            <motion.h1
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white leading-tight mb-4"
-            >
-              {poll.question}
-            </motion.h1>
             
-            {/* Description */}
             {poll.description && (
               <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed mb-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="text-blue-100 text-base leading-relaxed"
               >
                 {poll.description}
               </motion.p>
             )}
+          </div>
 
-            {/* Category Tag */}
-            {poll.category && (
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 }}
-                className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-medium"
-              >
-                <span className="mr-1">📂</span>
-                {poll.category}
-              </motion.div>
-            )}
+          {/* Community Insights for Everyone */}
+          <div className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+            <div className="flex items-center space-x-3 mb-4">
+              <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Community Insights
+              </h3>
+            </div>
+            <GlobalInsights poll={poll} />
           </div>
         </motion.div>
         
-        {/* Auth Check */}
-        {!user ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-2xl p-6 sm:p-8 border border-yellow-200 dark:border-yellow-800 mb-8"
-          >
-            <div className="text-center">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.7, type: "spring" }}
-                className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/50 rounded-full flex items-center justify-center mx-auto mb-4"
-              >
-                <Users className="h-8 w-8 text-yellow-600 dark:text-yellow-400" />
-              </motion.div>
+        {/* Content based on authentication and response status */}
+        <AnimatePresence mode="wait">
+          {!user ? (
+            // Unauthenticated users see insights and sign-in prompt
+            <motion.div
+              key="unauthenticated"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-6"
+            >
+              {/* Results for unauthenticated users */}
+              <ModernPollResults poll={poll} showPersonalizedInsights={false} />
               
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                Join the conversation
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Sign in to share your thoughts and see how others responded
-              </p>
-              
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/auth')}
-                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-              >
-                Sign In to Participate
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </motion.button>
-            </div>
-          </motion.div>
-        ) : (
-          <AnimatePresence mode="wait">
-            {!showResults ? (
+              {/* Sign-in prompt */}
               <motion.div
-                key="form"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ delay: 0.6 }}
+                transition={{ delay: 0.2 }}
+                className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-2xl p-6 border border-yellow-200 dark:border-yellow-800"
               >
-                {error && (
+                <div className="flex items-start space-x-4">
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="bg-red-50 dark:bg-red-900/20 rounded-xl p-4 sm:p-6 border border-red-200 dark:border-red-800 mb-6"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", delay: 0.3 }}
+                    className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/50 rounded-full flex items-center justify-center flex-shrink-0"
                   >
-                    <p className="text-red-800 dark:text-red-200 text-center font-medium">
+                    <UserPlus className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+                  </motion.div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                      🚀 Unlock Personalized Insights
+                    </h3>
+                    <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
+                      Sign in to answer this poll and get personalized insights based on your demographics. 
+                      See how your response compares to people with similar backgrounds, age groups, and locations.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => navigate('/auth')}
+                        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                      >
+                        Sign In to Answer
+                      </motion.button>
+                      <button
+                        onClick={() => navigate('/')}
+                        className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                      >
+                        Browse More Polls
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          ) : hasResponded ? (
+            // Authenticated users who have responded see full results
+            <motion.div
+              key="responded"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-6"
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-6 border border-green-200 dark:border-green-800"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center">
+                    <span className="text-2xl">✅</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-green-900 dark:text-green-100">
+                      Thanks for your response!
+                    </h3>
+                    <p className="text-green-700 dark:text-green-300">
+                      Here's how your answer compares to the community.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+              
+              <ModernPollResults poll={poll} showPersonalizedInsights={true} />
+            </motion.div>
+          ) : (
+            // Authenticated users who haven't responded see the form
+            <motion.div
+              key="form"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-6"
+            >
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="bg-red-50 dark:bg-red-900/20 rounded-2xl p-6 border border-red-200 dark:border-red-800"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center">
+                      <span className="text-red-600 dark:text-red-400">⚠️</span>
+                    </div>
+                    <p className="text-red-800 dark:text-red-200 font-medium">
                       {error}
                     </p>
-                  </motion.div>
-                )}
-                
-                <ModernPollResponseForm 
-                  poll={poll} 
-                  onSubmit={handlePollSubmit}
-                  isSubmitting={isSubmitting}
-                />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="results"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="space-y-6"
-              >
-                {hasResponded && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-6 border border-green-200 dark:border-green-800"
-                  >
-                    <div className="flex items-center justify-center space-x-3">
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.5, type: "spring" }}
-                      >
-                        <CheckCircle2 className="h-8 w-8 text-green-600 dark:text-green-400" />
-                      </motion.div>
-                      <div className="text-center">
-                        <h3 className="text-lg font-semibold text-green-800 dark:text-green-200">
-                          Response Recorded!
-                        </h3>
-                        <p className="text-green-700 dark:text-green-300">
-                          Thanks for sharing your thoughts. Here's how others responded.
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-                
-                <ModernPollResults poll={poll} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        )}
+                  </div>
+                </motion.div>
+              )}
+              
+              <ModernPollResponseForm 
+                poll={poll} 
+                onSubmit={handlePollSubmit}
+                isSubmitting={isSubmitting}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );

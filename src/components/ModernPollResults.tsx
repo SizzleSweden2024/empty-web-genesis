@@ -12,9 +12,13 @@ import PieChart from './charts/PieChart';
 
 interface ModernPollResultsProps {
   poll: Poll;
+  showPersonalizedInsights?: boolean;
 }
 
-const ModernPollResults: React.FC<ModernPollResultsProps> = ({ poll }) => {
+const ModernPollResults: React.FC<ModernPollResultsProps> = ({ 
+  poll, 
+  showPersonalizedInsights = true 
+}) => {
   const [filters, setFilters] = useState<FilterOptions>({});
   const [chartType, setChartType] = useState<'bar' | 'pie'>(() => {
     // Smart default based on poll type
@@ -120,7 +124,7 @@ const ModernPollResults: React.FC<ModernPollResultsProps> = ({ poll }) => {
   return (
     <div className="space-y-6">
       {/* Personalized Insights */}
-      {userResponse !== null && userResponse !== undefined && (
+      {showPersonalizedInsights && userResponse !== null && userResponse !== undefined && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -354,9 +358,9 @@ const ModernPollResults: React.FC<ModernPollResultsProps> = ({ poll }) => {
           >
             <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
               📊 {stats.count.toLocaleString()} total responses recorded so far. 
-              {stats.count < 20 && (
-                <span className="text-yellow-600 dark:text-yellow-400 ml-1">
-                  Results may not be representative due to small sample size.
+              {stats.count < 10 && stats.count > 0 && (
+                <span className="text-blue-600 dark:text-blue-400 ml-1">
+                  Early insights available — more responses will improve accuracy.
                 </span>
               )}
             </p>

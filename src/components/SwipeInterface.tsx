@@ -261,9 +261,9 @@ const SwipeInterface: React.FC<SwipeInterfaceProps> = ({
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 0.6, x: 0 }}
-          className="bg-green-500/80 backdrop-blur-sm rounded-full px-3 py-2 text-white text-sm font-medium"
+          className="bg-blue-500/80 backdrop-blur-sm rounded-full px-3 py-2 text-white text-sm font-medium"
         >
-          Answer →
+          View →
         </motion.div>
       </div>
     </div>
