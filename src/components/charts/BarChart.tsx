@@ -52,10 +52,15 @@ const BarChart: React.FC<BarChartProps> = ({
   
   if (values.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full min-h-[120px]">
-        <p className="text-gray-500 dark:text-gray-400 text-center text-xs sm:text-sm">
+      <div className="flex items-center justify-center h-full min-h-[200px]">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-3">
+            <span className="text-2xl">📊</span>
+          </div>
+        <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
           Not enough data to display this chart
         </p>
+        </div>
       </div>
     );
   }

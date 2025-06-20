@@ -59,10 +59,15 @@ const PieChart: React.FC<PieChartProps> = ({
   
   if (values.length === 0 || total === 0) {
     return (
-      <div className="flex items-center justify-center h-full min-h-[200px]">
-        <p className="text-gray-500 dark:text-gray-400 text-center text-xs sm:text-sm">
+      <div className="flex items-center justify-center h-full min-h-[300px]">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl">🥧</span>
+          </div>
+        <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
           Not enough data to display this chart
         </p>
+        </div>
       </div>
     );
   }
